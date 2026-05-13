@@ -1,0 +1,33 @@
+openapi: 3.0.0
+info:
+  title: API de Organigrama Empresarial
+  version: 1.0.0
+  description: Sistema para gestionar la jerarquía de puestos de la empresa.
+
+paths:
+  /nodes/root:
+    post:
+      summary: Crear el puesto máximo (ej. Gerencia General)
+      responses:
+        '201':
+          description: Raíz creada con éxito.
+
+  /nodes/{parentId}/children:
+    post:
+      summary: Agregar un subordinado a un puesto existente
+      parameters:
+        - name: parentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Subordinado agregado.
+	
+  /tree:
+    get:
+      summary: Obtener el organigrama completo
+      responses:
+        '200':
+          description: Estructura jerárquica en formato JSON. 
