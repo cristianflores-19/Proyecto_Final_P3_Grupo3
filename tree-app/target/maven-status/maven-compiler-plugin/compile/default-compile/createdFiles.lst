@@ -1,0 +1,4 @@
+com\p3\app\model\MongoNodeDocument.class
+com\p3\app\repository\MemoryTreeRepository.class
+com\p3\app\repository\MongoNodeRepository.class
+com\p3\app\repository\MongoTreeRepository.class
