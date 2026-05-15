@@ -57,4 +57,50 @@ public class CollectionsTreeStrategy implements TreeAlgorithmStrategy {
             dfsRecursive(child, result);
         }
     }
+
+    public int calculateHeight(Long rootId) {
+
+        if (!tree.containsKey(rootId)) {
+            return 0;
+        }
+
+        int maxHeight = 0;
+
+        for (Long child : tree.get(rootId)) {
+
+            int childHeight = calculateHeight(child);
+
+            maxHeight = Math.max(maxHeight, childHeight);
+        }
+
+        return maxHeight + 1;
+    }
+
+    public int calculateDepth(Long rootId, Long targetId) {
+
+        return depthRecursive(rootId, targetId, 0);
+    }
+
+    private int depthRecursive(Long current,
+                               Long target,
+                               int depth) {
+
+        if (current.equals(target)) {
+            return depth;
+        }
+
+        for (Long child : tree.getOrDefault(current,
+                new ArrayList<>())) {
+
+            int result = depthRecursive(child,
+                                        target,
+                                        depth + 1);
+
+            if (result != -1) {
+                return result;
+            }
+        }
+
+        return -1;
+    }
 }
