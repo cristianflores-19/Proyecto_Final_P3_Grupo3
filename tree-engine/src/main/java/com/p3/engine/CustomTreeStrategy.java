@@ -4,7 +4,7 @@ public class CustomTreeStrategy implements TreeAlgorithmStrategy {
 
     @Override
     public String getEngineType() {
-        return "Motor de Árbol Personalizado (Integrante A) - Semana 1";
+        return "Motor de Arbol Personalizado (Integrante A) - Semana 1";
     }
     
     // Aquí es donde en la Semana 2 programarás 

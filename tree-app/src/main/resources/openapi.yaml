@@ -7,13 +7,25 @@ info:
 paths:
   /nodes/root:
     post:
+      operationId: createRoot
       summary: Crear el puesto máximo (ej. Gerencia General)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNodeRequest'
       responses:
         '201':
           description: Raíz creada con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeResponse'
 
   /nodes/{parentId}/children:
     post:
+      operationId: addChild
       summary: Agregar un subordinado a un puesto existente
       parameters:
         - name: parentId
@@ -21,13 +33,56 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNodeRequest'
       responses:
         '201':
           description: Subordinado agregado.
-	
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeResponse'
+
   /tree:
     get:
+      operationId: getTree
       summary: Obtener el organigrama completo
       responses:
         '200':
-          description: Estructura jerárquica en formato JSON. 
+          description: Estructura jerárquica en formato JSON.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeResponse'
+
+components:
+  schemas:
+    CreateNodeRequest:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: string
+          example: "Gerencia General"
+
+    NodeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        value:
+          type: string
+          example: "Gerencia General"
+        parentId:
+          type: integer
+          format: int64
+          nullable: true
+          example: null
