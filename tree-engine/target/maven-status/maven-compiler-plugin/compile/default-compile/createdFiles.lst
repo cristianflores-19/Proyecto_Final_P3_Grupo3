@@ -1,3 +1,4 @@
+com\p3\engine\CustomTreeNode.class
+com\p3\engine\CollectionsTreeStrategy.class
 com\p3\engine\CustomTreeStrategy.class
 com\p3\engine\TreeAlgorithmStrategy.class
-com\p3\engine\CollectionsTreeStrategy.class
