@@ -1,13 +1,13 @@
 package com.p3.app.config;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
 import com.p3.app.repository.MongoTreeRepository;
 
 @Component
-@ConditionalOnProperty(name = "app.mongo.demo-data", havingValue = "true")
+@ConditionalOnExpression("'${app.storage:}' == 'mongo' and '${app.mongo.demo-data:false}' == 'true'")
 public class MongoDemoDataRunner implements CommandLineRunner {
 
     private final MongoTreeRepository mongoTreeRepository;
