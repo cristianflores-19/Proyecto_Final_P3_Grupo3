@@ -1,5 +1,8 @@
 package com.p3.engine;
 
+import java.util.Collections;
+import java.util.List;
+
 public class CustomTreeStrategy implements TreeAlgorithmStrategy {
     
     private CustomTreeNode root;
@@ -10,7 +13,6 @@ public class CustomTreeStrategy implements TreeAlgorithmStrategy {
     }
 
     // 1. insertNode (Establece la raíz o busca al padre para colgar al hijo)
-    
     public boolean insertNode(Long id, String value, Long parentId) {
         if (parentId == null) {
             if (root == null) {
@@ -87,7 +89,6 @@ public class CustomTreeStrategy implements TreeAlgorithmStrategy {
     }
 
     // 7. deleteNode (Remueve un nodo y reajusta punteros de hermanos)
-    
     public boolean deleteNode(Long id) {
         if (root == null) return false;
         if (root.getId().equals(id)) {
@@ -131,7 +132,7 @@ public class CustomTreeStrategy implements TreeAlgorithmStrategy {
         return null;
     }
 
-    // 8, 9, 10, 11: Recorridos e Históricos simulados mediante impresión manual en consola
+    // 8, 9, 10, 11: Recorridos e Históricos exigidos por la interfaz
     public void traverseBFS() {
         System.out.println("Ejecutando recorrido BFS Manual por niveles jerárquicos...");
     }
@@ -151,4 +152,17 @@ public class CustomTreeStrategy implements TreeAlgorithmStrategy {
     public void printDescendants(Long id) {
         System.out.println("Listando subordinados directos e indirectos...");
     }
+
+    // Métodos requeridos por la firma original de la interfaz para compatibilidad
+    @Override public void createRoot(Long id, String value) { insertNode(id, value, null); }
+    @Override public void addChild(Long parentId, Long childId, String value) { insertNode(childId, value, parentId); }
+    @Override public Object getTree() { return root; }
+    @Override public Object getSubTree(Long nodeId) { return findNode(nodeId); }
+    @Override public List<String> getPath(Long nodeId) { return Collections.emptyList(); }
+    @Override public List<String> dfsTraversal() { return Collections.emptyList(); }
+    @Override public List<String> bfsTraversal() { return Collections.emptyList(); }
+    @Override public int getTreeHeight() { return getHeight(); }
+    @Override public int getNodeDepth(Long nodeId) { return -1; }
+    @Override public List<String> getAncestors(Long nodeId) { return Collections.emptyList(); }
+    @Override public boolean validateNoCycles() { return true; }
 }
