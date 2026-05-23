@@ -4,103 +4,222 @@ import java.util.*;
 
 public class CollectionsTreeStrategy implements TreeAlgorithmStrategy {
 
-    private final Map<Long, List<Long>> tree = new HashMap<>();
+    private Long rootId;
+    private final Map<Long, String> values = new HashMap<>();
+    private final Map<Long, List<Long>> children = new HashMap<>();
+    private final Map<Long, Long> parents = new HashMap<>();
 
     @Override
     public String getEngineType() {
         return "Motor usando Collections Framework";
     }
 
-    public void addNode(Long parentId, Long childId) {
-
-        tree.putIfAbsent(parentId, new ArrayList<>());
-        tree.get(parentId).add(childId);
-
-        tree.putIfAbsent(childId, new ArrayList<>());
+    @Override
+    public void createRoot(Long id, String value) {
+        rootId = id;
+        values.put(id, value);
+        children.putIfAbsent(id, new ArrayList<>());
+        parents.put(id, null);
     }
 
-    public List<Long> bfs(Long rootId) {
+    @Override
+    public void addChild(Long parentId, Long childId, String value) {
+        if (!values.containsKey(parentId)) {
+            throw new IllegalArgumentException("El nodo padre no existe");
+        }
 
-        List<Long> result = new ArrayList<>();
-        Queue<Long> queue = new LinkedList<>();
+        values.put(childId, value);
+        children.putIfAbsent(parentId, new ArrayList<>());
+        children.putIfAbsent(childId, new ArrayList<>());
+        children.get(parentId).add(childId);
+        parents.put(childId, parentId);
+    }
+
+    @Override
+    public Object getTree() {
+        if (rootId == null) {
+            return null;
+        }
+        return buildTree(rootId);
+    }
+
+    @Override
+    public Object getSubTree(Long nodeId) {
+        if (!values.containsKey(nodeId)) {
+            throw new IllegalArgumentException("El nodo no existe");
+        }
+        return buildTree(nodeId);
+    }
+
+    @Override
+    public List<String> getPath(Long nodeId) {
+        if (!values.containsKey(nodeId)) {
+            throw new IllegalArgumentException("El nodo no existe");
+        }
+
+        LinkedList<String> path = new LinkedList<>();
+        Long current = nodeId;
+
+        while (current != null) {
+            path.addFirst(values.get(current));
+            current = parents.get(current);
+        }
+
+        return path;
+    }
+
+    @Override
+    public List<String> dfsTraversal() {
+        List<String> result = new ArrayList<>();
+        dfs(rootId, result, new HashSet<>());
+        return result;
+    }
+
+    @Override
+    public List<String> bfsTraversal() {
+        List<String> result = new ArrayList<>();
+
+        if (rootId == null) {
+            return result;
+        }
+
+        Queue<Long> queue = new ArrayDeque<>();
+        Set<Long> visited = new HashSet<>();
 
         queue.add(rootId);
+        visited.add(rootId);
 
         while (!queue.isEmpty()) {
-
             Long current = queue.poll();
+            result.add(values.get(current));
 
-            result.add(current);
-
-            for (Long child : tree.getOrDefault(current, new ArrayList<>())) {
-                queue.add(child);
+            for (Long child : children.getOrDefault(current, Collections.emptyList())) {
+                if (visited.add(child)) {
+                    queue.add(child);
+                }
             }
         }
 
         return result;
     }
 
-    public List<Long> dfs(Long rootId) {
-
-        List<Long> result = new ArrayList<>();
-
-        dfsRecursive(rootId, result);
-
-        return result;
+    @Override
+    public int getTreeHeight() {
+        if (rootId == null) {
+            return 0;
+        }
+        return height(rootId);
     }
 
-    private void dfsRecursive(Long node, List<Long> result) {
+    @Override
+    public int getNodeDepth(Long nodeId) {
+        if (!values.containsKey(nodeId)) {
+            return -1;
+        }
 
-        result.add(node);
+        int depth = 0;
+        Long current = nodeId;
 
-        for (Long child : tree.getOrDefault(node, new ArrayList<>())) {
-            dfsRecursive(child, result);
+        while (parents.get(current) != null) {
+            depth++;
+            current = parents.get(current);
+        }
+
+        return depth;
+    }
+
+    @Override
+    public List<String> getAncestors(Long nodeId) {
+        if (!values.containsKey(nodeId)) {
+            throw new IllegalArgumentException("El nodo no existe");
+        }
+
+        List<String> ancestors = new ArrayList<>();
+        Long current = parents.get(nodeId);
+
+        while (current != null) {
+            ancestors.add(values.get(current));
+            current = parents.get(current);
+        }
+
+        Collections.reverse(ancestors);
+        return ancestors;
+    }
+
+    @Override
+    public boolean validateNoCycles() {
+        if (rootId == null) {
+            return true;
+        }
+
+        Set<Long> visited = new HashSet<>();
+        Set<Long> recursionStack = new HashSet<>();
+
+        return !hasCycle(rootId, visited, recursionStack);
+    }
+
+    private void dfs(Long nodeId, List<String> result, Set<Long> visited) {
+        if (nodeId == null || !visited.add(nodeId)) {
+            return;
+        }
+
+        result.add(values.get(nodeId));
+
+        for (Long child : children.getOrDefault(nodeId, Collections.emptyList())) {
+            dfs(child, result, visited);
         }
     }
 
-    public int calculateHeight(Long rootId) {
+    private int height(Long nodeId) {
+        List<Long> nodeChildren = children.getOrDefault(nodeId, Collections.emptyList());
 
-        if (!tree.containsKey(rootId)) {
+        if (nodeChildren.isEmpty()) {
             return 0;
         }
 
-        int maxHeight = 0;
+        int max = 0;
 
-        for (Long child : tree.get(rootId)) {
-
-            int childHeight = calculateHeight(child);
-
-            maxHeight = Math.max(maxHeight, childHeight);
+        for (Long child : nodeChildren) {
+            max = Math.max(max, height(child));
         }
 
-        return maxHeight + 1;
+        return max + 1;
     }
 
-    public int calculateDepth(Long rootId, Long targetId) {
-
-        return depthRecursive(rootId, targetId, 0);
-    }
-
-    private int depthRecursive(Long current,
-                               Long target,
-                               int depth) {
-
-        if (current.equals(target)) {
-            return depth;
+    private boolean hasCycle(Long nodeId, Set<Long> visited, Set<Long> recursionStack) {
+        if (recursionStack.contains(nodeId)) {
+            return true;
         }
 
-        for (Long child : tree.getOrDefault(current,
-                new ArrayList<>())) {
+        if (visited.contains(nodeId)) {
+            return false;
+        }
 
-            int result = depthRecursive(child,
-                                        target,
-                                        depth + 1);
+        visited.add(nodeId);
+        recursionStack.add(nodeId);
 
-            if (result != -1) {
-                return result;
+        for (Long child : children.getOrDefault(nodeId, Collections.emptyList())) {
+            if (hasCycle(child, visited, recursionStack)) {
+                return true;
             }
         }
 
-        return -1;
+        recursionStack.remove(nodeId);
+        return false;
+    }
+
+    private Map<String, Object> buildTree(Long nodeId) {
+        Map<String, Object> node = new LinkedHashMap<>();
+        node.put("id", nodeId);
+        node.put("value", values.get(nodeId));
+
+        List<Map<String, Object>> childNodes = new ArrayList<>();
+
+        for (Long child : children.getOrDefault(nodeId, Collections.emptyList())) {
+            childNodes.add(buildTree(child));
+        }
+
+        node.put("children", childNodes);
+        return node;
     }
 }
