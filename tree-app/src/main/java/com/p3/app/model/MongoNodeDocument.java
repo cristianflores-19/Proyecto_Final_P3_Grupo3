@@ -44,4 +44,13 @@ public class MongoNodeDocument {
     public void setParentId(String parentId) {
         this.parentId = parentId;
     }
+    
+    @Override
+    public String toString() {
+        return "MongoNodeDocument{" +
+                "id='" + id + '\'' +
+                ", value='" + value + '\'' +
+                ", parentId='" + parentId + '\'' +
+                '}';
+    }  
 }
