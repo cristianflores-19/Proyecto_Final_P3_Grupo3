@@ -78,14 +78,18 @@ public class TreeService {
     private void reloadStrategy() {
         List<NodeEntity> nodes = repository.findAll();
 
-        if (nodes.isEmpty()) {
+        if (nodes == null || nodes.isEmpty()) {
             return;
         }
 
         NodeEntity root = nodes.stream()
                 .filter(n -> n.getParentId() == null)
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No existe nodo raíz"));
+                .orElse(null);
+
+        if (root == null) {
+            return; 
+        }
 
         strategy.createRoot(root.getId(), root.getValue());
 

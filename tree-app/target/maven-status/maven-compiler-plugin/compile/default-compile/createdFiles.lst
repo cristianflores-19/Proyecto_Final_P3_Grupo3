@@ -13,3 +13,4 @@ com\p3\app\api\TreeApi.class
 com\p3\app\dto\CreateNodeRequest.class
 com\p3\app\repository\PostgresTreeRepository.class
 com\p3\app\repository\NodeJpaRepository.class
+com\p3\app\config\MongoDemoDataRunner.class
