@@ -16,6 +16,10 @@ public class CollectionsTreeStrategy implements TreeAlgorithmStrategy {
 
     @Override
     public void createRoot(Long id, String value) {
+        values.clear();
+        children.clear();
+        parents.clear();
+
         rootId = id;
         values.put(id, value);
         children.putIfAbsent(id, new ArrayList<>());
@@ -26,6 +30,10 @@ public class CollectionsTreeStrategy implements TreeAlgorithmStrategy {
     public void addChild(Long parentId, Long childId, String value) {
         if (!values.containsKey(parentId)) {
             throw new IllegalArgumentException("El nodo padre no existe");
+        }
+        
+        if (values.containsKey(childId)) {
+            return;
         }
 
         values.put(childId, value);
@@ -174,11 +182,10 @@ public class CollectionsTreeStrategy implements TreeAlgorithmStrategy {
         List<Long> nodeChildren = children.getOrDefault(nodeId, Collections.emptyList());
 
         if (nodeChildren.isEmpty()) {
-            return 0;
+            return 1; 
         }
 
         int max = 0;
-
         for (Long child : nodeChildren) {
             max = Math.max(max, height(child));
         }
