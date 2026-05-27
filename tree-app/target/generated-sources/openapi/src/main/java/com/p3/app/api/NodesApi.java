@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-25T19:07:14.165348800-06:00[America/Guatemala]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-26T23:32:30.909-06:00[America/Regina]")
 @Validated
 @Tag(name = "nodes", description = "the nodes API")
 public interface NodesApi {

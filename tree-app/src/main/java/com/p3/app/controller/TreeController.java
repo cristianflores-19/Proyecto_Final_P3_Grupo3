@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/v1/tree")
 public class TreeController {
 
@@ -66,5 +67,10 @@ public class TreeController {
     @GetMapping("/validate")
     public boolean validate() {
         return treeService.validate();
+    }
+    
+    @GetMapping("/path/{id}")
+    public List<String> getPath(@PathVariable Long id) {
+        return treeService.getPath(id);
     }
 }
