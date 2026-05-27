@@ -18,7 +18,7 @@ import javax.annotation.Generated;
  * CreateNodeRequest
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-20T12:40:03.115833600-06:00[America/Guatemala]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-25T19:07:14.165348800-06:00[America/Guatemala]")
 public class CreateNodeRequest {
 
   private String value;
