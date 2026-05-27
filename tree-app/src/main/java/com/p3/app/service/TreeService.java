@@ -1,7 +1,8 @@
 package com.p3.app.service;
 
 import com.p3.app.entity.NodeEntity;
-import com.p3.app.repository.PostgresTreeRepository;
+import com.p3.app.repository.NodeRepository; // 👈 Cambiado: Usamos la interfaz común superior
+import com.p3.app.repository.TreeDataRepository;
 import com.p3.engine.TreeAlgorithmStrategy;
 import org.springframework.stereotype.Service;
 
@@ -10,13 +11,18 @@ import java.util.List;
 @Service
 public class TreeService {
 
-    private final PostgresTreeRepository repository;
-    private final TreeAlgorithmStrategy strategy;
+    // 🌟 Una sola variable limpia apuntando a la interfaz común
+    private final TreeDataRepository repository; 
+    private final TreeAlgorithmStrategy strategy; // (Asegúrate de que se llame TreeAlgorithmStrategy o TreeAlgorithmStrategy según tu interfaz de motor)
 
-    public TreeService(PostgresTreeRepository repository, TreeAlgorithmStrategy strategy) {
+    // 🌟 El constructor recibe únicamente la interfaz común superior
+    public TreeService(TreeDataRepository repository, TreeAlgorithmStrategy strategy) {
         this.repository = repository;
         this.strategy = strategy;
     }
+
+    // ... Todo el resto de tus métodos (createRoot, addChild, reloadStrategy) se quedan tal cual los tienes.
+
 
     public NodeEntity createRoot(String value) {
         NodeEntity root = repository.saveRoot(value);
@@ -93,6 +99,8 @@ public class TreeService {
         }
 
         strategy.createRoot(root.getId(), root.getValue());
+
+        nodes.sort(java.util.Comparator.comparing(NodeEntity::getId));
 
         for (NodeEntity node : nodes) {
             if (node.getParentId() != null) {

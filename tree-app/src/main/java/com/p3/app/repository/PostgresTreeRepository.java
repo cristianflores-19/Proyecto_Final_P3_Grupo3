@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@ConditionalOnProperty(name = "app.storage", havingValue = "postgres") 
-public class PostgresTreeRepository {
+@ConditionalOnProperty(name = "app.storage", havingValue = "postgres")
+public class PostgresTreeRepository implements TreeDataRepository {
 
     private final NodeJpaRepository nodeJpaRepository;
 
