@@ -21,6 +21,14 @@ public class CollectionsTreeStrategy implements TreeAlgorithmStrategy {
         children.putIfAbsent(id, new ArrayList<>());
         parents.put(id, null);
     }
+    
+    @Override
+    public void clear() {
+        rootId = null;
+        values.clear();
+        children.clear();
+        parents.clear();
+    }
 
     @Override
     public void addChild(Long parentId, Long childId, String value) {
