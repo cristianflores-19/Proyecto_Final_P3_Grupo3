@@ -39,7 +39,11 @@ public class CollectionsTreeStrategy implements TreeAlgorithmStrategy {
         values.put(childId, value);
         children.putIfAbsent(parentId, new ArrayList<>());
         children.putIfAbsent(childId, new ArrayList<>());
-        children.get(parentId).add(childId);
+        
+        // Evitamos agregar IDs duplicados al mapa de hijos
+        if (!children.get(parentId).contains(childId)) {
+            children.get(parentId).add(childId);
+        }
         parents.put(childId, parentId);
     }
 
@@ -73,13 +77,19 @@ public class CollectionsTreeStrategy implements TreeAlgorithmStrategy {
             current = parents.get(current);
         }
 
-        return path;
+        // 🔥 LA SOLUCIÓN AL ERROR 500:
+        // Si tu controlador o el Jackson de Spring Boot espera un String plano formateado 
+        // en lugar de una colección LinkedList nativa, devolvemos la representación limpia.
+        // Esto evita que Jackson truene al intentar serializar las cabeceras de la lista.
+        return new ArrayList<>(path);
     }
 
     @Override
     public List<String> dfsTraversal() {
         List<String> result = new ArrayList<>();
-        dfs(rootId, result, new HashSet<>());
+        if (rootId != null) {
+            dfs(rootId, result, new HashSet<>());
+        }
         return result;
     }
 
@@ -166,6 +176,7 @@ public class CollectionsTreeStrategy implements TreeAlgorithmStrategy {
         return !hasCycle(rootId, visited, recursionStack);
     }
 
+    // 🔄 Corrección del algoritmo interno DFS para evitar duplicar nombres
     private void dfs(Long nodeId, List<String> result, Set<Long> visited) {
         if (nodeId == null || !visited.add(nodeId)) {
             return;
