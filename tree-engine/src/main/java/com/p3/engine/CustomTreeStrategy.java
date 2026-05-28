@@ -1,7 +1,6 @@
 package com.p3.engine;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class CustomTreeStrategy implements TreeAlgorithmStrategy {
     
@@ -137,7 +136,6 @@ public class CustomTreeStrategy implements TreeAlgorithmStrategy {
         return null;
     }
 
-    // 8, 9, 10, 11: Recorridos e Históricos exigidos por la interfaz
     public void traverseBFS() {
         System.out.println("Ejecutando recorrido BFS Manual por niveles jerárquicos...");
     }
@@ -158,16 +156,141 @@ public class CustomTreeStrategy implements TreeAlgorithmStrategy {
         System.out.println("Listando subordinados directos e indirectos...");
     }
 
-    // Métodos requeridos por la firma original de la interfaz para compatibilidad
-    @Override public void createRoot(Long id, String value) { insertNode(id, value, null); }
-    @Override public void addChild(Long parentId, Long childId, String value) { insertNode(childId, value, parentId); }
-    @Override public Object getTree() { return root; }
-    @Override public Object getSubTree(Long nodeId) { return findNode(nodeId); }
-    @Override public List<String> getPath(Long nodeId) { return Collections.emptyList(); }
-    @Override public List<String> dfsTraversal() { return Collections.emptyList(); }
-    @Override public List<String> bfsTraversal() { return Collections.emptyList(); }
-    @Override public int getTreeHeight() { return getHeight(); }
-    @Override public int getNodeDepth(Long nodeId) { return -1; }
-    @Override public List<String> getAncestors(Long nodeId) { return Collections.emptyList(); }
-    @Override public boolean validateNoCycles() { return true; }
+    // =========================================================================
+    // 🔥 MÉTODOS TRADUCTORES ADAPTADOS AL CONTRATO DEL FRONTEND (D3.JS / SWAGGER)
+    // =========================================================================
+    
+    @Override 
+    public void createRoot(Long id, String value) { 
+        root = null; // Reseteamos la raíz para consistencia del ABM
+        insertNode(id, value, null); 
+    }
+    
+    @Override 
+    public void addChild(Long parentId, Long childId, String value) { 
+        insertNode(childId, value, parentId); 
+    }
+    
+    @Override 
+    public Object getTree() { 
+        if (root == null) return null;
+        return convertNodeToFrontendMap(root); 
+    }
+    
+    @Override 
+    public Object getSubTree(Long nodeId) { 
+        CustomTreeNode target = findNode(nodeId);
+        if (target == null) return null;
+        return convertNodeToFrontendMap(target);
+    }
+    
+    @Override 
+    public List<String> getPath(Long nodeId) { 
+        CustomTreeNode target = findNode(nodeId);
+        if (target == null) return new ArrayList<>();
+        
+        LinkedList<String> path = new LinkedList<>();
+        CustomTreeNode current = target;
+        while (current != null) {
+            path.addFirst(current.getValue());
+            current = current.getParent();
+        }
+        return new ArrayList<>(path);
+    }
+    
+    @Override 
+    public List<String> dfsTraversal() { 
+        List<String> result = new ArrayList<>();
+        runDfsManual(root, result);
+        return result; 
+    }
+    
+    private void runDfsManual(CustomTreeNode node, List<String> result) {
+        if (node == null) return;
+        result.add(node.getValue());
+        CustomTreeNode child = node.getFirstChild();
+        while (child != null) {
+            runDfsManual(child, result);
+            child = child.getNextSibling();
+        }
+    }
+    
+    @Override 
+    public List<String> bfsTraversal() { 
+        List<String> result = new ArrayList<>();
+        if (root == null) return result;
+        
+        Queue<CustomTreeNode> queue = new ArrayDeque<>();
+        queue.add(root);
+        
+        while (!queue.isEmpty()) {
+            CustomTreeNode current = queue.poll();
+            result.add(current.getValue());
+            
+            CustomTreeNode child = current.getFirstChild();
+            while (child != null) {
+                queue.add(child);
+                child = child.getNextSibling();
+            }
+        }
+        return result;
+    }
+    
+    @Override 
+    public int getTreeHeight() { 
+        return getHeight(); 
+    }
+    
+    @Override 
+    public int getNodeDepth(Long nodeId) { 
+        CustomTreeNode target = findNode(nodeId);
+        if (target == null) return -1;
+        
+        int depth = 0;
+        CustomTreeNode current = target;
+        while (current.getParent() != null) {
+            depth++;
+            current = current.getParent();
+        }
+        return depth; 
+    }
+    
+    @Override 
+    public List<String> getAncestors(Long nodeId) { 
+        CustomTreeNode target = findNode(nodeId);
+        if (target == null) return new ArrayList<>();
+        
+        List<String> ancestors = new ArrayList<>();
+        CustomTreeNode current = target.getParent();
+        while (current != null) {
+            ancestors.add(current.getValue());
+            current = current.getParent();
+        }
+        Collections.reverse(ancestors);
+        return ancestors; 
+    }
+    
+    @Override 
+    public boolean validateNoCycles() { 
+        // En una estructura de puntero jerárquico puro firstChild/nextSibling, 
+        // la creación controlada impide físicamente la existencia de ciclos cruzados relacionales.
+        return true; 
+    }
+
+    // 🌟 Mapeador recursivo para empaquetar el árbol Custom en llaves "id", "value" y "children"
+    private Map<String, Object> convertNodeToFrontendMap(CustomTreeNode node) {
+        Map<String, Object> jsonMap = new LinkedHashMap<>();
+        jsonMap.put("id", node.getId());
+        jsonMap.put("value", node.getValue());
+        
+        List<Map<String, Object>> childrenList = new ArrayList<>();
+        CustomTreeNode child = node.getFirstChild();
+        while (child != null) {
+            childrenList.add(convertNodeToFrontendMap(child));
+            child = child.getNextSibling();
+        }
+        
+        jsonMap.put("children", childrenList);
+        return jsonMap;
+    }
 }

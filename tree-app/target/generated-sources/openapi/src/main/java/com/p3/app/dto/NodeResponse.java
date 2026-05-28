@@ -21,7 +21,7 @@ import javax.annotation.Generated;
  * NodeResponse
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-25T19:07:14.165348800-06:00[America/Guatemala]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-26T23:32:30.909-06:00[America/Regina]")
 public class NodeResponse {
 
   private Long id;
