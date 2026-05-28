@@ -82,6 +82,7 @@ public class TreeService {
     }
 
     private void reloadStrategy() {
+    	strategy.clear();
         List<NodeEntity> nodes = repository.findAll();
 
         if (nodes == null || nodes.isEmpty()) {

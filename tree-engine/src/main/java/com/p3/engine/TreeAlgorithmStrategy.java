@@ -39,4 +39,6 @@ public interface TreeAlgorithmStrategy {
 
     // 11. Validar ciclos
     boolean validateNoCycles();
+    
+    void clear();
 }

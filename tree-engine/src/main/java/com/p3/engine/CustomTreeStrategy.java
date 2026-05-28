@@ -10,6 +10,11 @@ public class CustomTreeStrategy implements TreeAlgorithmStrategy {
     public String getEngineType() {
         return "Motor Custom de Punteros - Semana 2";
     }
+    
+    @Override
+    public void clear() {
+        
+    }
 
     // 1. insertNode (Establece la raíz o busca al padre para colgar al hijo)
     public boolean insertNode(Long id, String value, Long parentId) {
