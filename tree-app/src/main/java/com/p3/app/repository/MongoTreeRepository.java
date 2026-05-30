@@ -26,11 +26,12 @@ public class MongoTreeRepository implements TreeDataRepository {
 
     @Override
     public NodeEntity saveRoot(String value) {
-        // Generamos un ID temporal o dejamos que Mongo lo maneje. 
-        // Como tu NodeEntity usa Long para ID, simulamos el contador con el tiempo actual
-        long fakeId = System.currentTimeMillis() % 100000;
+        // 🚨 COMENTAMOS EL DELETEALL PARA QUE NO BORRE TUS DATOS DEL FRONTEND
+        // mongoNodeRepository.deleteAll(); 
         
-        MongoNodeDocument doc = new MongoNodeDocument(String.valueOf(fakeId), value, null);
+        // La raíz siempre tendrá el ID "1" fijo por consistencia
+        String rootId = "1";
+        MongoNodeDocument doc = new MongoNodeDocument(rootId, value, null);
         MongoNodeDocument savedDoc = mongoNodeRepository.save(doc);
         
         return convertToEntity(savedDoc);
@@ -38,9 +39,11 @@ public class MongoTreeRepository implements TreeDataRepository {
 
     @Override
     public NodeEntity saveChild(Long parentId, String value) {
-        long fakeId = (System.currentTimeMillis() % 100000) + 1;
+        // 🚀 SECUENCIA ESTABLE: Contamos cuántos nodos hay en Mongo y le sumamos 1
+        // Esto imita perfectamente el comportamiento autoincrementable de Postgres (1, 2, 3, 4...)
+        String nextId = String.valueOf(mongoNodeRepository.count() + 1);
         
-        MongoNodeDocument doc = new MongoNodeDocument(String.valueOf(fakeId), value, String.valueOf(parentId));
+        MongoNodeDocument doc = new MongoNodeDocument(nextId, value, String.valueOf(parentId));
         MongoNodeDocument savedDoc = mongoNodeRepository.save(doc);
         
         return convertToEntity(savedDoc);
